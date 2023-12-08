@@ -1,4 +1,4 @@
-# Reservationn Manager
+# Reservation Manager
 @TODO / if we had more time
 1) Don't store appts in memory, store in db or local file
 2) Create a utility method to check for isWithin24Hrs that addAvailability, refreshPendingReservations, & refreshOpenReservations can all reuse.
