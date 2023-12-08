@@ -1,5 +1,6 @@
 package reservation.manager.service;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.PropertySource;
@@ -23,8 +24,7 @@ public class ReservationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReservationService.class);
 
-    // Original value of 30 min is commented out because we're not waiting 30 min for a unit test to pass
-    private static final long THIRTY_MIN_IN_MS = 1000 /*DateUtils.MILLIS_PER_HOUR / 2*/;
+    private static final long THIRTY_MIN_IN_MS = DateUtils.MILLIS_PER_HOUR / 2;
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -41,6 +41,8 @@ public class ReservationService {
      */
     private final Map<String, Set<Reservation>> confirmedReservations;
 
+    private long pendingTtl;
+
     /**
      * Constructor for the class.
      */
@@ -48,7 +50,20 @@ public class ReservationService {
         openReservations = new HashMap<>();
         pendingReservations = new HashMap<>();
         confirmedReservations = new HashMap<>();
+        pendingTtl = THIRTY_MIN_IN_MS;
     }
+
+    /**
+     * Constructor for testing.
+     */
+    public ReservationService(long overrideTtl) {
+        openReservations = new HashMap<>();
+        pendingReservations = new HashMap<>();
+        confirmedReservations = new HashMap<>();
+        pendingTtl = overrideTtl;
+    }
+
+
 
     /**
      * Adds to availability map.
@@ -149,7 +164,7 @@ public class ReservationService {
             targetReservation.setPatient(patient);
             pendingReservations.put(ReservationUtil.generatePendingReservationKey(date.toString(), provider,
                             targetReservation.getTimeBlock()),
-                    new PendingReservation(System.currentTimeMillis() + THIRTY_MIN_IN_MS, targetReservation));
+                    new PendingReservation(System.currentTimeMillis() + pendingTtl, targetReservation));
             return true;
         }
         return false;

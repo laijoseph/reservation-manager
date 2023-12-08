@@ -22,7 +22,7 @@ class ReservationServiceTest {
      */
     @BeforeEach
     void setUp() {
-        classUnderTest = new ReservationService();
+        classUnderTest = new ReservationService(1000);
     }
 
     /**
