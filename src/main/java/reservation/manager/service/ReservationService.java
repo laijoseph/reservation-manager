@@ -24,8 +24,7 @@ public class ReservationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReservationService.class);
 
-//    private static final long THIRTY_MIN_IN_MS = DateUtils.MILLIS_PER_HOUR / 2;
-    private static final long THIRTY_MIN_IN_MS = 3000;
+    private static final long THIRTY_MIN_IN_MS = DateUtils.MILLIS_PER_HOUR / 2;
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -169,16 +168,18 @@ public class ReservationService {
      * @return  {@code true} if active reservation was found, {@code false} otherwise
      */
     public boolean confirm(String provider, String patient, String date, LocalTime time) {
+        long cur = System.currentTimeMillis();
         String key = ReservationUtil.generatePendingReservationKey(date, provider,
                 ReservationUtil.convertTimeToBlock(time));
         PendingReservation pending = pendingReservations.get(key);
+        pendingReservations.remove(key);
 
         // We don't need a null check for getPatient() because it can't be null if it's in this map
         if (pending == null || !pending.getReservation().getPatient().equals(patient)) {
 
             /* Reservation for this person at this time with this provider doesn't exist */
             return false;
-        } else if (pending.getExpiry() < System.currentTimeMillis()) { // Check if reservation is invalid
+        } else if (pending.getExpiry() < cur) { // Check if reservation is invalid
             Reservation expiredReservation = pending.getReservation();
             expiredReservation.clearPatient();
             openReservations.get(date).add(expiredReservation);
