@@ -16,13 +16,13 @@ class ReservationServiceTest {
 
     private ReservationService classUnderTest;
 
-
     /**
      * Sets up tests.
      */
     @BeforeEach
     void setUp() {
-        classUnderTest = new ReservationService(1000);
+        classUnderTest = new ReservationService();
+        classUnderTest.setPendingTtl(1000);
     }
 
     /**

@@ -24,7 +24,8 @@ public class ReservationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReservationService.class);
 
-    private static final long THIRTY_MIN_IN_MS = DateUtils.MILLIS_PER_HOUR / 2;
+//    private static final long THIRTY_MIN_IN_MS = DateUtils.MILLIS_PER_HOUR / 2;
+    private static final long THIRTY_MIN_IN_MS = 3000;
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -52,18 +53,6 @@ public class ReservationService {
         confirmedReservations = new HashMap<>();
         pendingTtl = THIRTY_MIN_IN_MS;
     }
-
-    /**
-     * Constructor for testing.
-     */
-    public ReservationService(long overrideTtl) {
-        openReservations = new HashMap<>();
-        pendingReservations = new HashMap<>();
-        confirmedReservations = new HashMap<>();
-        pendingTtl = overrideTtl;
-    }
-
-
 
     /**
      * Adds to availability map.
@@ -261,5 +250,14 @@ public class ReservationService {
      */
     private int timeBlockOfNow() {
         return ReservationUtil.convertTimeToBlock(LocalTime.now());
+    }
+
+    /**
+     * Used to override the 30 min confirmation window.
+     *
+     * @param ttlOverride time in ms
+     */
+    public void setPendingTtl (long ttlOverride) {
+        pendingTtl = ttlOverride;
     }
 }
